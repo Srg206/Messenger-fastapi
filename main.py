@@ -73,27 +73,16 @@ def login(user_data: CreateUser):
     else:
         return{"error": "Invalid credentials"}
 
-# @app.post("/create_user")
-# def login(user_data: CreateUser):
-#     print("create_user")
-#     Session = sessionmaker(bind=sync_engine)
-#     session = Session()
-#     if (session.execute(text('SELECT *  FROM your_table_name WHERE your_column_name = :email;'), value=CreateUser.email) is None):
-#         hashed_password = encode_password(user_data.password)
-#         query='INSERT INTO "user" ( email, name, password)  VALUES ('xxx@gmail.ru', 'vacts', '123');'
-#         new_record = User(name=user_data.username, email=user_data.email, password=hashed_password)
-#         session.add(new_record)
-#         session.commit()
-#         session.close()
-#         return {"access_token": create_jwt_token({"sub": user_data.email})}
-#     else:
-#         return{"error": "Invalid credentials"}
         
 
 @app.post("/login")
-def login(client_data: Client):
-    if client_data.Client_name in Clients and Clients[client_data.Client_name].password==client_data.password:
-        return {"access_token": create_jwt_token({"sub": client_data.Client_name})}
+def login(user_data: LoginUser):
+    Session = sessionmaker(bind=sync_engine)
+    session = Session()
+    found_user=session.query(User).filter_by(email=user_data.email).first() 
+    print(user_data.password)
+    if (found_user is not None) and verify_password(user_data.password,found_user.password):
+        return {"access_token": create_jwt_token({"sub": user_data.email})}
     else:
         return{"error": "Invalid credentials"}
     

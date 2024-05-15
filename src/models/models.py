@@ -19,7 +19,7 @@ class User(Base):
     name = Column(String,  nullable=False, default='user')
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
-    role_id=Column(Integer, ForeignKey('role.id'), default=1)
+    role_id=Column(Integer, ForeignKey('role.id'),nullable=True)
     role=relationship("Role")
 
 

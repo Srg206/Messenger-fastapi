@@ -27,7 +27,6 @@ def upgrade():
     sa.UniqueConstraint('email')
     )
     op.create_index(op.f('ix_users_id'), 'users', ['id'], unique=False)
-    op.drop_table('accounts')
     # ### end Alembic commands ###
 
 
