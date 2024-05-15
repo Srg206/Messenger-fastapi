@@ -16,10 +16,10 @@ class Role(Base):
 class User(Base):
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String,  nullable=False)
+    name = Column(String,  nullable=False, default='user')
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
-    role_id=Column(Integer, ForeignKey('role.id'))
+    role_id=Column(Integer, ForeignKey('role.id'), default=1)
     role=relationship("Role")
 
 

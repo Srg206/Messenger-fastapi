@@ -4,7 +4,9 @@ from src import *
 from src.connection import *
 from sqlalchemy import String, create_engine, text
 from src.config import Postgres_asyncpg_URL, Postgres_psycopg_URL
-
+from src.models.models import User
+from src.schemes.schemes import CreateUser, LoginUser
+from src.utils.utils import encode_password,verify_password
 from datetime import datetime
 from typing import List, Union
 
@@ -16,23 +18,17 @@ from fastapi.security import OAuth2PasswordBearer
 from dotenv import load_dotenv
 import os
 
+
+
 app=FastAPI()
 
 load_dotenv()
-
-POSTGRES_HOST = os.environ.get("POSTGRES_HOST")
-POSTGRES_PORT = os.environ.get("POSTGRES_PORT")
-POSTGRES_DB = os.environ.get("POSTGRES_DB")
-POSTGRES_USER = os.environ.get("POSTGRES_USER")
-POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
 SECRET_KEY=os.environ.get("SECRET_KEY")
 ALGORITHM=os.environ.get("ALGORITHM")
 
-Session = sessionmaker(bind=engine)
-session = Session()
 
 #token_urls = ["login", "create"]
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="")
 
 Abilities={"guest":"r",
       "user":"ru",
@@ -62,6 +58,37 @@ def decode_token(token:str= Depends(oauth2_scheme)):
     decoded_token = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     return decoded_token.get("sub")
 
+@app.post("/create_user")
+def login(user_data: CreateUser):
+    print("create_user")
+    Session = sessionmaker(bind=sync_engine)
+    session = Session()
+    if (session.query(User).filter_by(email=user_data.email).first() is None):
+        hashed_password = encode_password(user_data.password)
+        new_record = User(name=user_data.username, email=user_data.email, password=hashed_password)
+        session.add(new_record)
+        session.commit()
+        session.close()
+        return {"access_token": create_jwt_token({"sub": user_data.email})}
+    else:
+        return{"error": "Invalid credentials"}
+
+# @app.post("/create_user")
+# def login(user_data: CreateUser):
+#     print("create_user")
+#     Session = sessionmaker(bind=sync_engine)
+#     session = Session()
+#     if (session.execute(text('SELECT *  FROM your_table_name WHERE your_column_name = :email;'), value=CreateUser.email) is None):
+#         hashed_password = encode_password(user_data.password)
+#         query='INSERT INTO "user" ( email, name, password)  VALUES ('xxx@gmail.ru', 'vacts', '123');'
+#         new_record = User(name=user_data.username, email=user_data.email, password=hashed_password)
+#         session.add(new_record)
+#         session.commit()
+#         session.close()
+#         return {"access_token": create_jwt_token({"sub": user_data.email})}
+#     else:
+#         return{"error": "Invalid credentials"}
+        
 
 @app.post("/login")
 def login(client_data: Client):
@@ -70,6 +97,7 @@ def login(client_data: Client):
     else:
         return{"error": "Invalid credentials"}
     
+
 @app.post("/create")
 def create(token:str=Depends(decode_token), new_note:str=Body()):
     if token in Clients and 'c' in Abilities[Clients[token].role]:
