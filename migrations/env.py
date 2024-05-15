@@ -4,7 +4,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 import os
 from src.models.models import Base
 # this is the Alembic Config object, which provides
@@ -16,13 +16,22 @@ section = config.config_ini_section
 fileConfig(config.config_file_name)
 
 
-load_dotenv("../.env")
-
+load_dotenv(find_dotenv())
 POSTGRES_HOST = os.getenv("POSTGRES_HOST")
 POSTGRES_PORT = os.getenv("POSTGRES_PORT")
 POSTGRES_DB = os.getenv("POSTGRES_DB")
 POSTGRES_USER = os.getenv("POSTGRES_USER")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+
+
+
+config.set_section_option(section,"POSTGRES_PORT",POSTGRES_PORT)
+config.set_section_option(section,"POSTGRES_USER",POSTGRES_USER)
+config.set_section_option(section,"POSTGRES_DB",POSTGRES_DB)
+config.set_section_option(section,"POSTGRES_PASSWORD",POSTGRES_PASSWORD)
+config.set_section_option(section,"POSTGRES_HOST",POSTGRES_HOST)
+
+
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel

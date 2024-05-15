@@ -10,6 +10,7 @@ class Role(Base):
     __tablename__ = 'role'
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String,  nullable=False)
+    role_ability_id=Column(Integer, ForeignKey('ability.id'))
 
 
 class User(Base):
@@ -22,8 +23,8 @@ class User(Base):
     role=relationship("Role")
 
 
-class www(Base):
-    __tablename__ = 'www'
+class ability(Base):
+    __tablename__ = 'ability'
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String,  nullable=False)
 
