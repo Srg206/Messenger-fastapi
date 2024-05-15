@@ -18,7 +18,12 @@ class User(Base):
     name = Column(String,  nullable=False)
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
-    user_role=Column(String, ForeignKey('role.name'))
+    role_id=Column(Integer, ForeignKey('role.id'))
     role=relationship("Role")
 
+
+class www(Base):
+    __tablename__ = 'www'
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String,  nullable=False)
 

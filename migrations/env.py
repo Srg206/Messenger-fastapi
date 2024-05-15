@@ -16,7 +16,7 @@ section = config.config_ini_section
 fileConfig(config.config_file_name)
 
 
-load_dotenv()
+load_dotenv("../.env")
 
 POSTGRES_HOST = os.getenv("POSTGRES_HOST")
 POSTGRES_PORT = os.getenv("POSTGRES_PORT")
