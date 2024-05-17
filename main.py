@@ -17,46 +17,16 @@ import jwt
 from fastapi.security import OAuth2PasswordBearer
 from dotenv import load_dotenv
 import os
+from src.utils.utils import *
+from src.work_with_info.router import info_router
 
 
 
 app=FastAPI()
 
-load_dotenv()
-SECRET_KEY=os.environ.get("SECRET_KEY")
-ALGORITHM=os.environ.get("ALGORITHM")
+app.include_router(info_router)
 
 
-#token_urls = ["login", "create"]
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="")
-
-Abilities={"guest":"r",
-      "user":"ru",
-      "admin":"crud"
-      }
-
-
-class Client(BaseModel):
-    role:str
-    Client_name:str
-    password:str
-
-Clients ={
-    "Pipister":Client(role="guest",Client_name="Pipister",password="1"),
-    "Voprosi":Client(role="user",Client_name="Voprosi",password="2"),
-    "C++ovich":Client(role="admin",Client_name="C++ovich",password="3")
-}
-
-notes=["mmmmm"] 
-
-
-def create_jwt_token(data: dict):
-    return jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
-
-
-def decode_token(token:str= Depends(oauth2_scheme)):
-    decoded_token = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    return decoded_token.get("sub")
 
 @app.post("/create_user")
 def login(user_data: CreateUser):
@@ -87,33 +57,3 @@ def login(user_data: LoginUser):
         return{"error": "Invalid credentials"}
     
 
-@app.post("/create")
-def create(token:str=Depends(decode_token), new_note:str=Body()):
-    if token in Clients and 'c' in Abilities[Clients[token].role]:
-        notes.append(new_note)
-        return {"Added your note"}
-    else:
-        return {"Could not add your note"}
-
-@app.get("/read")
-def create(token:str=Depends(decode_token)):
-    if token in Clients and 'r' in Abilities[Clients[token].role]:
-        return notes
-    else:
-        return {"Could not give you notes"}
-
-@app.post("/delete")
-def create(token:str=Depends(decode_token)):
-    if token in Clients and 'd' in Abilities[Clients[token].role]:
-        notes.clear()
-        return {"Deleted all notes"}
-    else:
-        return {"You Could not delete notes"}
-
-
-
-
-
-@app.get("/unprotected")
-def unprotected_data():
-    return {"this is unprotected data, which can get everyone"}
