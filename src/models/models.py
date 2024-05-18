@@ -1,4 +1,4 @@
-from sqlalchemy import MetaData,Table,Column, Integer, String, ForeignKey
+from sqlalchemy import MetaData,Table,Column, Integer, String, ForeignKey, ARRAY
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 Base = declarative_base()
@@ -20,6 +20,7 @@ class User(Base):
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
     role_id=Column(Integer, ForeignKey('role.id'),nullable=True)
+    chats = Column(ARRAY(Integer),nullable=True)
     role=relationship("Role")
 
 

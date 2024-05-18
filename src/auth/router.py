@@ -5,6 +5,8 @@ from sqlalchemy import select, insert
 from ..models.models import User
 from ..utils.utils import *
 from .schemes.schemes import CreateUser, LoginUser
+from ..connection import *
+
 auth_router = APIRouter(
     prefix="/auth",
     tags=["auth"]
@@ -16,8 +18,7 @@ auth_router = APIRouter(
 @auth_router.post("/create_user")
 def login(user_data: CreateUser):
     print("create_user")
-    Session = sessionmaker(bind=sync_engine)
-    session = Session()
+    session = sync_session
     if (session.query(User).filter_by(email=user_data.email).first() is None):
         hashed_password = encode_password(user_data.password)
         new_record = User(name=user_data.username, email=user_data.email, password=hashed_password)
@@ -32,8 +33,7 @@ def login(user_data: CreateUser):
 
 @auth_router.post("/login")
 def login(user_data: LoginUser):
-    Session = sessionmaker(bind=sync_engine)
-    session = Session()
+    session = get_session()
     found_user=session.query(User).filter_by(email=user_data.email).first() 
     print(user_data.password)
     if (found_user is not None) and verify_password(user_data.password,found_user.password):

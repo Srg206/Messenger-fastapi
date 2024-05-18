@@ -21,9 +21,7 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 
-session_maker = sessionmaker(bind=sync_engine, expire_on_commit=False)
-def get_session() -> Generator[Session, None, None]:
-    with session_maker() as session:
-        yield session
+Session = sessionmaker(bind=sync_engine)
+sync_session = Session()
         
 
