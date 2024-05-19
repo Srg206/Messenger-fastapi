@@ -19,11 +19,12 @@ import os
 from src.utils.utils import *
 from src.work_with_info.router import info_router
 from src.auth.router import *
+from src.chat_messages.message_router.message_router import *
 
 
 
 app=FastAPI()
-
+app.include_router(message_router)
 app.include_router(info_router)
 app.include_router(auth_router)
 

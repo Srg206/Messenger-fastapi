@@ -1,7 +1,7 @@
 from sqlalchemy import MetaData,Table,Column, Integer, String, ForeignKey, ARRAY
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from __init__ import*
+#from __init__ import*
 
 Base = declarative_base()
 
@@ -18,7 +18,7 @@ class Message(Base):
     __tablename__ = 'message'
     id = Column(Integer, primary_key=True, index=True)
     content=Column(String)
-    chat_id=Column(Integer,ForeignKey('chat.id'))
-    user_id=Column(Integer, ForeignKey('user.id'))
+    chat_id=Column(Integer,ForeignKey('chat.id'), default=None)
+    user_id=Column(Integer, ForeignKey('user.id'), default=None)
 
 

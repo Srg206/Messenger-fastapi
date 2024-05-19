@@ -33,7 +33,7 @@ def login(user_data: CreateUser):
 
 @auth_router.post("/login")
 def login(user_data: LoginUser):
-    session = get_session()
+    session = sync_session
     found_user=session.query(User).filter_by(email=user_data.email).first() 
     print(user_data.password)
     if (found_user is not None) and verify_password(user_data.password,found_user.password):
