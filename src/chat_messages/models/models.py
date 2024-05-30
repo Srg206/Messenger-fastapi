@@ -1,8 +1,7 @@
 from sqlalchemy import MetaData,Table,Column, Integer, String, ForeignKey, ARRAY
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from .__init__ import Base, metadata
 #from __init__ import*
+from .__init__ import Base
 
 class Chat(Base):
     __tablename__ = 'chat'

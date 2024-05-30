@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Body, Depends
 from pydantic import BaseModel
-from ..connection import *
+from ..connection import * # type: ignore
 from sqlalchemy import select, insert
 from ..models.models import User
 from ..utils.utils import *
@@ -33,6 +33,7 @@ def login(user_data: CreateUser):
 
 @auth_router.post("/login")
 def login(user_data: LoginUser):
+    print('login')
     session = sync_session
     found_user=session.query(User).filter_by(email=user_data.email).first() 
     print(user_data.password)
