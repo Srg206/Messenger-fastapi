@@ -1,8 +1,8 @@
-"""fixed default role_id
+"""initial migration
 
-Revision ID: 0429ce4a926e
-Revises: 978386698c77
-Create Date: 2024-05-16 01:22:15.142794
+Revision ID: 5bb09a060dba
+Revises: 
+Create Date: 2024-05-30 22:02:47.199113
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '0429ce4a926e'
-down_revision = '978386698c77'
+revision = '5bb09a060dba'
+down_revision = None
 branch_labels = None
 depends_on = None
 
