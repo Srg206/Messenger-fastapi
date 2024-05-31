@@ -35,4 +35,5 @@ def create_jwt_token(data: dict):
 
 def decode_token(token:str= Depends(oauth2_scheme)):
     decoded_token = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    return decode_token
 

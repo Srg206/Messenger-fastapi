@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Body, Depends
 from pydantic import BaseModel
-from ..connection import *
+from ..connection_to_postgres import *
 from sqlalchemy import select, insert
-from ..models.models import User
+from ..auth.models.models import User
 from ..utils.utils import *
 info_router = APIRouter(
     prefix="/work_with_info",

@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Body, Depends
 from pydantic import BaseModel
-from ..connection import * # type: ignore
+from ..connection_to_postgres import * # type: ignore
 from sqlalchemy import select, insert
-from ..models.models import User
+from .models.models import User
 from ..utils.utils import *
 from .schemes.schemes import CreateUser, LoginUser
-from ..connection import *
+from ..connection_to_postgres import *
 
 auth_router = APIRouter(
     prefix="/auth",

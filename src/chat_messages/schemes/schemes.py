@@ -1,12 +1,14 @@
 from pydantic import BaseModel
+from datetime import time
 
 class Chat(BaseModel):
-    email:str
-    username:str
-    password:str
+    id:int
+    name:str
+    last_msg_id:int
 
 class Message(BaseModel):
+    id:int
     content:str
-    chat_id:str=None
-    email:str=None
-
+    chat_id:int
+    user_id:int
+    time:time

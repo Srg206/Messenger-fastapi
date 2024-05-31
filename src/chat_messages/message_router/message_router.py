@@ -6,16 +6,17 @@ from ..schemes.schemes import *
 from .__init__ import *
 from ..models.models import *
 import json
-from .ConnectionManager import manager
+from ..ConnectionManager import manager
 message_router = APIRouter(
     prefix="/msg",
     tags=["msg"]
 )
-@message_router.websocket("/get")
-async def websocket_endpoint(websocket: WebSocket):
+@message_router.websocket("/get_msgs/")
+async def websocket_endpoint(chat_id : int, websocket: WebSocket):
     await manager.connect(websocket)
     try:
         while True:
+            msg=WebSocket.receive_json
             data = await websocket.receive_text()
             await manager.send_personal_message(f"You wrote: {data}", websocket)
             await manager.broadcast(f"{data}")
