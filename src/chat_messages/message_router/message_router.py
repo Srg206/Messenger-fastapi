@@ -1,28 +1,40 @@
 from fastapi import APIRouter, Body, Depends, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 from sqlalchemy import select, insert
+
+from src.auth.models.models import User
+from src.utils.utils import decode_token
 #from ..models.models import User
 from ..schemes.schemes import *
 from .__init__ import *
 from ..models.models import *
 import json
-from ..ConnectionManager import manager
+from ..ChatManager import ChatManager
 message_router = APIRouter(
     prefix="/msg",
     tags=["msg"]
 )
+
+
+@message_router.get("/get_last_messages")
+async def get_last_chats(chat_id:int):
+    session = sync_session
+    messages=session.query(Message).order_by(Message.time).limit(100).all()
+    return messages     
+    
+
 @message_router.websocket("/get_msgs/")
 async def websocket_endpoint(chat_id : int, websocket: WebSocket):
-    await manager.connect(websocket)
+    await ChatManager.connect(websocket)
     try:
         while True:
             msg=WebSocket.receive_json
             data = await websocket.receive_text()
-            await manager.send_personal_message(f"You wrote: {data}", websocket)
-            await manager.broadcast(f"{data}")
+            await ChatManager.send_personal_message(f"You wrote: {data}", websocket)
+            await ChatManager.broadcast(f"{data}")
     except WebSocketDisconnect:
-        manager.disconnect(websocket)
-        await manager.broadcast(f"Client left the chat")
+        ChatManager.disconnect(websocket)
+        await ChatManager.broadcast(f"Client left the chat")
 
 
         

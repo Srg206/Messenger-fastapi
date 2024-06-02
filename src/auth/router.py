@@ -7,6 +7,7 @@ from ..utils.utils import *
 from .schemes.schemes import CreateUser, LoginUser
 from ..connection_to_postgres import *
 
+
 auth_router = APIRouter(
     prefix="/auth",
     tags=["auth"]
@@ -36,8 +37,11 @@ def login(user_data: LoginUser):
     print('login')
     session = sync_session
     found_user=session.query(User).filter_by(email=user_data.email).first() 
-    print(user_data.password)
+    #print(user_data.password)
+    print("USER---  ",user_data)
     if (found_user is not None) and verify_password(user_data.password,found_user.password):
-        return {"access_token": create_jwt_token({"sub": user_data.email})}
+        token=create_jwt_token({"sub": user_data.email})
+        print(token)
+        return {"access_token": token }
     else:
         return{"error": "Invalid credentials"}

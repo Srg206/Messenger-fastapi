@@ -17,7 +17,7 @@ class User(Base):
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
     role_id=Column(Integer, ForeignKey('role.id'),nullable=True)
-    chats = Column(ARRAY(Integer),nullable=True)
+    chats = Column(ARRAY(Integer),nullable=True,default=[])
     role=relationship("Role")
 
 
