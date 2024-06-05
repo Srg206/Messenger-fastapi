@@ -22,19 +22,15 @@ chat_router = APIRouter(
     tags=["chat"]
 )
 
-class PydtcMessage(BaseModel):
-    id:int
-    content:str
-    chat_id:int
-    user_id:int
-    time:time
-
 def ConverToPydentic(msg:Message):
+    print("ok")
     if(msg!=None):
-        return PydtcMessage(id=msg.id,content=msg.content, chat_id=msg.chat_id, user_id=msg.user_id, time=msg.time)
+        return PydtcMessage(id=msg.id,content=msg.content, chat_id=msg.chat_id, 
+                            user_id=msg.user_id,date=str(msg.date)  , time=str(msg.time), timezone=msg.timezone)
     else:
         return None
         
+
 
 @chat_router.post("/create_chat")
 async def create_chat(new_chat:CreateChat):
@@ -45,13 +41,25 @@ async def create_chat(new_chat:CreateChat):
     session.commit()
     
     print(new_record.id)
-    greeting=Message(content="HELLO EVERYBODY", chat_id=new_record.id, user_id=1)
+    timezone_str = 'Europe/Moscow'
+
+    greeting = Message(
+        content="HELLO EVERYBODY",
+        chat_id=new_record.id,
+        timezone=timezone_str  # Ensure this is a string
+    )
+
+    #greeting=Message(content="HELLO EVERYBODY", chat_id=new_record.id )
     print(greeting)
     
-    session.add(greeting)
+    session.add(greeting)  
+    session.flush()
+    chat = session.query(Chat).filter(Chat.id==new_record.id).first().last_msg_id=greeting.id
     session.commit()
     
     chat_id =new_record.id
+    print(new_chat.users)
+    print("chat id is ---- ",chat_id)
     
     for user_id in new_chat.users:
         user = session.query(User).filter(User.id == user_id).first()
@@ -60,7 +68,11 @@ async def create_chat(new_chat:CreateChat):
                 user.chats = []
             user.chats.append(chat_id)
             session.commit()
-                 
+            print(user.chats)
+    for user_id in new_chat.users:
+        user = session.query(User).filter(User.id == user_id).first()
+        print(user.chats)
+    session.commit()
     session.close()
         
     
@@ -68,15 +80,18 @@ async def create_chat(new_chat:CreateChat):
 async def get_last_chats(token:str=Depends(decode_token)):
     got_gmail=token["sub"]
     session = sync_session
+    print(got_gmail)
     chats_id=session.query(User).filter_by(email=got_gmail).first().chats
     chats = session.query(Chat).filter(Chat.id.in_(chats_id)).all()
     this_user_chats=[]
+    print(chats[0].id)
     for x in chats:
+        print(session.query(Message).filter_by(id=x.last_msg_id).first().id)
         last_message=ConverToPydentic(session.query(Message).filter_by(id=x.last_msg_id).first())
         print(last_message)
         cur_chat={'chat_name':x.name,"last_message":last_message,'chat_id':x.id}
         this_user_chats.append(cur_chat)
-        
+    
     this_user_chats = sorted(this_user_chats, key=lambda x: x['last_message'].time)
     return this_user_chats
         

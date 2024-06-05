@@ -1,9 +1,15 @@
 import datetime
-from sqlalchemy import DateTime, MetaData,Table,Column, Integer, String, ForeignKey, ARRAY
+import pytz
+from sqlalchemy import Date, DateTime, MetaData,Table,Column, Integer, String, ForeignKey, ARRAY, Time
 from sqlalchemy.orm import relationship
 #from __init__ import*
 from .__init__ import Base
 from zoneinfo import ZoneInfo
+
+def get_moscow_time():
+    tz = pytz.timezone('Europe/Moscow')
+    #datetime.
+    return datetime.datetime.now
 
 class Chat(Base):
     __tablename__ = 'chat'
@@ -19,5 +25,8 @@ class Message(Base):
     content=Column(String)
     chat_id=Column(Integer,ForeignKey('chat.id'), default=None)
     user_id=Column(Integer, ForeignKey('user.id'), default=None,nullable=True)
-    time = Column(DateTime,  default=lambda: datetime.now(ZoneInfo("Europe/Moscow")))
+    date=Column(Date, default=datetime.datetime.now().date, nullable=False)
+    time = Column(DateTime, default=datetime.datetime.now, nullable=False)
+    timezone=Column(String(500), nullable=False)
+    #time = Column(DateTime,  default=lambda: datetime.now(ZoneInfo("Europe/Moscow")))
 

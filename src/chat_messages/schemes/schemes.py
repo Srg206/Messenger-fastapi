@@ -2,6 +2,8 @@ from typing import List
 from pydantic import BaseModel
 from datetime import time
 
+from sqlalchemy import Date, DateTime
+
 
 class GlobalChat(BaseModel):
     id: int
@@ -15,9 +17,12 @@ class CreateChat(BaseModel):
     users: List[int]
 
     
-class Message(BaseModel):
+
+class PydtcMessage(BaseModel):
     id:int
     content:str
     chat_id:int
     user_id:int
-    time:time
+    date:str
+    time:str
+    timezone:str
