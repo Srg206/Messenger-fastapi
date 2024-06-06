@@ -16,7 +16,6 @@ from fastapi.security import OAuth2PasswordBearer
 from dotenv import load_dotenv
 import os
 from src.utils.utils import *
-from src.work_with_info.router import info_router
 from src.auth.router import auth_router
 from src.chat_messages.message_router.message_router import *
 #from src.chat_messages.chat_router import chat_router
@@ -51,6 +50,5 @@ app.add_middleware(
 
 app.include_router(message_router)
 app.include_router(chat_router)
-app.include_router(info_router)
 app.include_router(auth_router)
 

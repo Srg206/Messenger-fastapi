@@ -16,6 +16,10 @@ class Chat(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String,  nullable=False, default='chat')
     last_msg_id=Column(Integer,ForeignKey('message.id'), default=None,nullable=True)
+    
+    
+    
+    
     users = Column(ARRAY(Integer),nullable=True)
     
 
@@ -29,4 +33,7 @@ class Message(Base):
     time = Column(DateTime, default=datetime.datetime.now, nullable=False)
     timezone=Column(String(500), nullable=False)
     #time = Column(DateTime,  default=lambda: datetime.now(ZoneInfo("Europe/Moscow")))
+
+    
+
 

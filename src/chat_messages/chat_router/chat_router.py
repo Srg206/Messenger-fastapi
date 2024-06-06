@@ -4,8 +4,8 @@ from pydantic import BaseModel
 from sqlalchemy import select, insert
 
 from src.auth.models.models import User
+from src.chat_messages.utils.utils import ConverToPydentic
 from src.utils.utils import decode_token
-#from ..models.models import User
 from ..schemes.schemes import CreateChat
 from .__init__ import *
 from ..models.models import *
@@ -13,68 +13,20 @@ import json
 from ..ChatManager import ChatManager
 from ..__init__ import *
 from ..schemes.schemes import*
-
 from ..SuperManager import spManager
-
+from src.work_with_db.work_with_chats import*
 
 chat_router = APIRouter(
     prefix="/chat",
     tags=["chat"]
 )
 
-def ConverToPydentic(msg:Message):
-    print("ok")
-    if(msg!=None):
-        return PydtcMessage(id=msg.id,content=msg.content, chat_id=msg.chat_id, 
-                            user_id=msg.user_id,date=str(msg.date)  , time=str(msg.time), timezone=msg.timezone)
-    else:
-        return None
-        
 
 
 @chat_router.post("/create_chat")
 async def create_chat(new_chat:CreateChat):
     print(new_chat)
-    session = sync_session
-    new_record = Chat(name=new_chat.name, users= new_chat.users )
-    session.add(new_record)
-    session.commit()
-    
-    print(new_record.id)
-    timezone_str = 'Europe/Moscow'
-
-    greeting = Message(
-        content="HELLO EVERYBODY",
-        chat_id=new_record.id,
-        timezone=timezone_str  # Ensure this is a string
-    )
-
-    #greeting=Message(content="HELLO EVERYBODY", chat_id=new_record.id )
-    print(greeting)
-    
-    session.add(greeting)  
-    session.flush()
-    chat = session.query(Chat).filter(Chat.id==new_record.id).first().last_msg_id=greeting.id
-    session.commit()
-    
-    chat_id =new_record.id
-    print(new_chat.users)
-    print("chat id is ---- ",chat_id)
-    
-    for user_id in new_chat.users:
-        user = session.query(User).filter(User.id == user_id).first()
-        if user:
-            if user.chats is None:
-                user.chats = []
-            user.chats.append(chat_id)
-            session.commit()
-            print(user.chats)
-    for user_id in new_chat.users:
-        user = session.query(User).filter(User.id == user_id).first()
-        print(user.chats)
-    session.commit()
-    session.close()
-        
+    insert_new_chat(new_chat)        
     
 @chat_router.get("/get_last_chats")
 async def get_last_chats(token:str=Depends(decode_token)):
