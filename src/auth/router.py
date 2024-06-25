@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Depends, HTTPException
 from pydantic import BaseModel
 from ..connection_to_postgres import * # type: ignore
 from sqlalchemy import select, insert
@@ -28,7 +28,11 @@ def login(user_data: CreateUser):
         session.close()
         return {"access_token": create_jwt_token({"sub": user_data.email})}
     else:
-        return{"error": "Invalid credentials"}
+         raise HTTPException(
+            status_code=401,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
         
 
@@ -44,4 +48,8 @@ def login(user_data: LoginUser):
         print(token)
         return {"access_token": token }
     else:
-        return{"error": "Invalid credentials"}
+         raise HTTPException(
+            status_code=401,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )

@@ -33,13 +33,13 @@ async def get_last_chats(token:str=Depends(decode_token)):
     got_gmail=token["sub"]
     session = sync_session
     print(got_gmail)
-    chats_id=session.query(User).filter_by(email=got_gmail).first().chats
-    chats = session.query(Chat).filter(Chat.id.in_(chats_id)).all()
+    chats=session.query(User).filter_by(email=got_gmail).first().chats
+    #chats = session.query(Chat).filter(Chat.id.in_(chats_id)).all()
     this_user_chats=[]
-    print(chats[0].id)
+    #print(chats[0].id)
     for x in chats:
-        print(session.query(Message).filter_by(id=x.last_msg_id).first().id)
-        last_message=ConverToPydentic(session.query(Message).filter_by(id=x.last_msg_id).first())
+        #print(session.query(Message).filter_by(id=x.last_msg_id).first().id)
+        last_message=ConverToPydentic(x.messages[-1])
         print(last_message)
         cur_chat={'chat_name':x.name,"last_message":last_message,'chat_id':x.id}
         this_user_chats.append(cur_chat)

@@ -5,22 +5,24 @@ from sqlalchemy import pool
 
 from alembic import context
 
+
+
 from dotenv import load_dotenv, find_dotenv
 import os
 from src.Base import Base
 from src.auth.models.models import *
 from src.chat_messages.models.models import *
+from src.chat_messages.models.association_models import *
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 section = config.config_ini_section
+
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
-
-
-
 
 load_dotenv(find_dotenv())
 POSTGRES_HOST = os.getenv("POSTGRES_HOST")
@@ -36,8 +38,6 @@ config.set_section_option(section,"POSTGRES_USER",POSTGRES_USER)
 config.set_section_option(section,"POSTGRES_DB",POSTGRES_DB)
 config.set_section_option(section,"POSTGRES_PASSWORD",POSTGRES_PASSWORD)
 config.set_section_option(section,"POSTGRES_HOST",POSTGRES_HOST)
-
-
 
 # add your model's MetaData object here
 # for 'autogenerate' support
