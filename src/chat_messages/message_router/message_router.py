@@ -11,10 +11,13 @@ from ..models.models import *
 import json
 from ..ChatManager import ChatManager
 from ..schemes.schemes import GotMsg
+from ..SuperManager import spManager
 message_router = APIRouter(
     prefix="/msg",
     tags=["msg"]
 )
+
+#chat_manager = ChatManager(name="ChatName", last_msg_id=0, users=[])
 
 
 @message_router.get("/get_last_messages/{chat_id}")
@@ -49,19 +52,78 @@ async def send_message(new_msg: GotMsg):
 
 
 
-@message_router.websocket("/get_msgs/")
+#chat_manager=ChatManager()
+@message_router.websocket("/get_msgs/{chat_id}")
 async def websocket_endpoint(chat_id : int, websocket: WebSocket):
-    await ChatManager.connect(websocket)
+    
+    # #await websocket.accept()
+    chat_manager=spManager.active_connections[chat_id]
+    # print(chat_manager)
+    # print(chat_manager.active_connections)    
+    await chat_manager.connect(websocket)
+    # print(chat_manager)
+    print(chat_manager.active_connections)    
     try:
         while True:
-            msg=WebSocket.receive_json
+            #msg=WebSocket.receive_json
             data = await websocket.receive_text()
-            #await ChatManager.send_personal_message(f"You wrote: {data}", websocket)
-            await ChatManager.broadcast(f"{data}")
-    except WebSocketDisconnect:
-        ChatManager.disconnect(websocket)
-        await ChatManager.broadcast(f"Client left the chat")
+            print(chat_manager.active_connections)
+            # session = sync_session
+            # token = websocket.headers.get("Authorization").decode("utf-8")
+            # email=decode_token(token)['sub']
+            # user=session.query(User).filter(User.email==email).first()
+            # chat=session.query(Chat).filter(Chat.id==chat_id).first()
+            # db_msg=Message(
+            #     content=data,
+            #     chat_id=chat_id,
+            #     user_id=user.id,
+            #     timezone='Europe/Moscow'
+            # )
+            # session.add(db_msg)  
+            # session.flush()
+            
+            # db_msg.user=user
+            # db_msg.chat=chat
+            # print(db_msg.chat_id)
+            # user.messages.append(db_msg)
+            # chat.messages.append(db_msg)
+            # session.commit()
+            # session.close()
 
+            
+            
+            
+            #await ChatManager.send_personal_message(f"You wrote: {data}", websocket)
+            await chat_manager.broadcast(f"{data}")
+    except WebSocketDisconnect as wsDis:
+        print(wsDis)
+        chat_manager.disconnect(websocket)
+        await chat_manager.broadcast(f"Client left the chat")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        await chat_manager.disconnect(websocket)
+        
+        
+        
+        
+        
+        
+# @message_router.websocket("/get_msgs/{chat_id}")
+# async def websocket_endpoint(websocket: WebSocket, chat_id: int):
+#     await websocket.accept()
+#     token = websocket.headers.get("Authorization")
+#     if not token or not validate_token(token):  # Implement your token validation
+#         await websocket.close(code=1008)  # 1008: Policy Violation
+#         return
+#     await ChatManager.connect(websocket)
+#     try:
+#         while True:
+#             data = await websocket.receive_text()
+#             await ChatManager.send_personal_message(f"You wrote: {data}", websocket)
+#             await ChatManager.broadcast(f"{data}")
+#     except WebSocketDisconnect:
+#         ChatManager.disconnect(websocket)
+#         await ChatManager.broadcast(f"Client left the chat")
 
         
 # @message_router.websocket("/get")

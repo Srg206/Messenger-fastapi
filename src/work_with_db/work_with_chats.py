@@ -4,7 +4,7 @@ from src.chat_messages.models.models import Chat, Message
 from src.chat_messages.schemes.schemes import CreateChat
 from ..connection_to_postgres import *
 from src.chat_messages.models.association_models import User_Chat
-
+from ..chat_messages.message_router.message_router import *
 
 
 
@@ -14,6 +14,9 @@ def insert_new_chat(new_chat:CreateChat):
     new_record = Chat(name=new_chat.name)
     session.add(new_record)
     session.flush()
+    
+    spManager.active_connections[new_record.id]=ChatManager()
+    
     add_users_by_id(new_chat.users,new_record, session)
     session.flush()
     
@@ -30,6 +33,8 @@ def insert_new_chat(new_chat:CreateChat):
     new_record.messages.append(Chat_created_message)
     session.commit()
     session.close()
+    
+    
     
 def add_users_by_id(users,chat:Chat, session ):
     this_chat_users=session.query(User).filter(User.id.in_(users)).all()

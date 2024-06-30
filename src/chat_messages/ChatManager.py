@@ -6,13 +6,15 @@ from .schemes.schemes import GlobalChat
 
 
 class ChatManager:
-    def __init__(self, id:int,name:str, last_msg_id:int, users:List[int] ):
+    def __init__(self):
         self.active_connections: list[WebSocket] = []
-        self.related_chat=GlobalChat(id,name,last_msg_id,users)  
+        #print(active_connections)
+        #self.related_chat=GlobalChat(id,name,last_msg_id,users)  
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
         self.active_connections.append(websocket)
+        #print(active_connections)
 
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
