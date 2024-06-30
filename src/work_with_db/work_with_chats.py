@@ -31,27 +31,6 @@ def insert_new_chat(new_chat:CreateChat):
     session.commit()
     session.close()
     
-    # chat_id =new_record.id
-    # print(new_chat.users)
-    # print("chat id is ---- ",chat_id)
-    
-    # users = session.query(User).filter(User.id.in_(new_chat.users)).all()
-    # #print("users - ",users)
-    
-    
-    
-    # for user in users:
-    #     user.chats = session.query(Chat).filter(Chat.id==chat_id).first()
-    #     session.commit()
-        
-        
-    
-           
-    # #session.commit()
-    # for user_id in new_chat.users:
-    #     user = session.query(User).filter(User.id == user_id).first()
-    #     print(user.chats)
-    
 def add_users_by_id(users,chat:Chat, session ):
     this_chat_users=session.query(User).filter(User.id.in_(users)).all()
     for user in this_chat_users:

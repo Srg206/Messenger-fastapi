@@ -29,7 +29,7 @@ class Message(Base):
     content=Column(String)
     date=Column(Date, default=datetime.datetime.now().date, nullable=False)
     time = Column(DateTime, default=datetime.datetime.now, nullable=False)
-    timezone=Column(String(500), nullable=False)
+    timezone=Column(String(500), nullable=False, default="Europe/Moscow")
     
     chat_id= Column(Integer, ForeignKey("chat.id", ondelete="CASCADE"), nullable=False, index=True)
     user_id= Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)

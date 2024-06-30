@@ -26,3 +26,8 @@ class PydtcMessage(BaseModel):
     date:str
     time:str
     timezone:str
+
+class GotMsg(BaseModel):
+    content:str
+    chat_id:int
+    token:str

@@ -10,18 +10,44 @@ from .__init__ import *
 from ..models.models import *
 import json
 from ..ChatManager import ChatManager
+from ..schemes.schemes import GotMsg
 message_router = APIRouter(
     prefix="/msg",
     tags=["msg"]
 )
 
 
-@message_router.get("/get_last_messages")
+@message_router.get("/get_last_messages/{chat_id}")
 async def get_last_chats(chat_id:int):
     session = sync_session
-    messages=session.query(Message).order_by(Message.time).limit(100).all()
-    return messages     
+    messages=session.query(Message).filter(Message.chat_id == chat_id).order_by(Message.time).limit(100).all()
+    return messages        
     
+
+@message_router.post("/send_message")
+async def send_message(new_msg: GotMsg):
+    session = sync_session
+    email=decode_token(new_msg.token)['sub']
+    user=session.query(User).filter(User.email==email).first()
+    chat=session.query(Chat).filter(Chat.id==new_msg.chat_id).first()
+    db_msg=Message(
+        content=new_msg.content,
+        chat_id=new_msg.chat_id,
+        user_id=user.id,
+        timezone='Europe/Moscow'
+    )
+    session.add(db_msg)  
+    session.flush()
+    
+    db_msg.user=user
+    db_msg.chat=chat
+    print(db_msg.chat_id)
+    user.messages.append(db_msg)
+    chat.messages.append(db_msg)
+    session.commit()
+    session.close()
+
+
 
 @message_router.websocket("/get_msgs/")
 async def websocket_endpoint(chat_id : int, websocket: WebSocket):
@@ -30,7 +56,7 @@ async def websocket_endpoint(chat_id : int, websocket: WebSocket):
         while True:
             msg=WebSocket.receive_json
             data = await websocket.receive_text()
-            await ChatManager.send_personal_message(f"You wrote: {data}", websocket)
+            #await ChatManager.send_personal_message(f"You wrote: {data}", websocket)
             await ChatManager.broadcast(f"{data}")
     except WebSocketDisconnect:
         ChatManager.disconnect(websocket)
