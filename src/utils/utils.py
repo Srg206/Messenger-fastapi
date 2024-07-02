@@ -33,7 +33,7 @@ def verify_password(password, old_password):
 
 
 #token_urls = ["login", "create"]
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="") # tokenUrl это url по которым можно выпустить токен
 
 
 

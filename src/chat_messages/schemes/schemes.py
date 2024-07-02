@@ -31,3 +31,8 @@ class GotMsg(BaseModel):
     content:str
     chat_id:int
     token:str
+class Msg_to_db(BaseModel):
+    content:str
+    chat_id:int
+    user_id:int
+    

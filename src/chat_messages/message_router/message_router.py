@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body, Depends, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Body, Depends, HTTPException, Header, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 from sqlalchemy import select, insert
 
@@ -10,8 +10,10 @@ from .__init__ import *
 from ..models.models import *
 import json
 from ..ChatManager import ChatManager
-from ..schemes.schemes import GotMsg
+from ..schemes.schemes import GotMsg, Msg_to_db
 from ..SuperManager import spManager
+from src.work_with_db.work_with_messages import *
+
 message_router = APIRouter(
     prefix="/msg",
     tags=["msg"]
@@ -29,81 +31,28 @@ async def get_last_chats(chat_id:int):
 
 @message_router.post("/send_message")
 async def send_message(new_msg: GotMsg):
-    session = sync_session
-    email=decode_token(new_msg.token)['sub']
-    user=session.query(User).filter(User.email==email).first()
-    chat=session.query(Chat).filter(Chat.id==new_msg.chat_id).first()
-    db_msg=Message(
-        content=new_msg.content,
-        chat_id=new_msg.chat_id,
-        user_id=user.id,
-        timezone='Europe/Moscow'
-    )
-    session.add(db_msg)  
-    session.flush()
-    
-    db_msg.user=user
-    db_msg.chat=chat
-    print(db_msg.chat_id)
-    user.messages.append(db_msg)
-    chat.messages.append(db_msg)
-    session.commit()
-    session.close()
+    insert_message(new_msg)
 
 
 
 #chat_manager=ChatManager()
 @message_router.websocket("/get_msgs/{chat_id}")
 async def websocket_endpoint(chat_id : int, websocket: WebSocket):
-    
-    # #await websocket.accept()
-    chat_manager=spManager.active_connections[chat_id]
-    # print(chat_manager)
-    # print(chat_manager.active_connections)    
+    chat_manager=spManager.active_connections[chat_id] 
     await chat_manager.connect(websocket)
-    # print(chat_manager)
     print(chat_manager.active_connections)    
     try:
         while True:
-            #msg=WebSocket.receive_json
             data = await websocket.receive_text()
             print(chat_manager.active_connections)
-            # session = sync_session
-            # token = websocket.headers.get("Authorization").decode("utf-8")
-            # email=decode_token(token)['sub']
-            # user=session.query(User).filter(User.email==email).first()
-            # chat=session.query(Chat).filter(Chat.id==chat_id).first()
-            # db_msg=Message(
-            #     content=data,
-            #     chat_id=chat_id,
-            #     user_id=user.id,
-            #     timezone='Europe/Moscow'
-            # )
-            # session.add(db_msg)  
-            # session.flush()
-            
-            # db_msg.user=user
-            # db_msg.chat=chat
-            # print(db_msg.chat_id)
-            # user.messages.append(db_msg)
-            # chat.messages.append(db_msg)
-            # session.commit()
-            # session.close()
-
-            
-            
-            
-            #await ChatManager.send_personal_message(f"You wrote: {data}", websocket)
             await chat_manager.broadcast(f"{data}")
     except WebSocketDisconnect as wsDis:
         print(wsDis)
         chat_manager.disconnect(websocket)
-        await chat_manager.broadcast(f"Client left the chat")
     except Exception as e:
         print(f"Unexpected error: {e}")
         await chat_manager.disconnect(websocket)
-        
-        
+    
         
         
         

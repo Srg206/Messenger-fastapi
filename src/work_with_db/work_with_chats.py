@@ -41,5 +41,3 @@ def add_users_by_id(users,chat:Chat, session ):
     for user in this_chat_users:
         chat.users.append(user)
         
-    
-    

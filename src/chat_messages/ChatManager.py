@@ -12,6 +12,7 @@ class ChatManager:
         #self.related_chat=GlobalChat(id,name,last_msg_id,users)  
 
     async def connect(self, websocket: WebSocket):
+        #websocket.headers.get
         await websocket.accept()
         self.active_connections.append(websocket)
         #print(active_connections)
