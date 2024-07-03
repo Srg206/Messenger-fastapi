@@ -2,11 +2,10 @@ import time
 from fastapi import Depends, HTTPException, Response
 from src.auth.models.models import User
 #from src.auth.router import AUTH_EX, SERV_EX
-from src.auth.schemes.schemes import LoginUser
 from src.utils.utils import create_jwt_token, decode_token, verify_password
 from ..connection_to_postgres import sync_session
 from sqlalchemy.orm import Session
-from ..auth.schemes.schemes import Tokens
+from ..auth.schemes.schemes import Tokens, User_to_login
 from dotenv import load_dotenv
 import os
 from typing import Dict
@@ -34,7 +33,7 @@ DB_SERV_EX=HTTPException(
 #Tokens_bd: Dict[str, Tokens]={}
 Tokens_bd: Dict[str, str]={}
 
-def Login_User(user_data: LoginUser,response: Response):
+def Login_User(user_data: User_to_login,response: Response):
     found_user=Email_in_bd(user_data.email)
     if found_user and verify_password(user_data.password,found_user.password):
         access_token=create_jwt_token({"sub": user_data.email, "created_at": round(time.time())})
@@ -54,7 +53,7 @@ def Cookie_is_Valid(access_token:str):
     if Email_in_bd(atoken["sub"]):
         return validate_access_token(access_token)# if None that means we should login with pass
     else:
-        return AUTH_EX
+        raise AUTH_EX
 
 
 def validate_access_token(access_token:str): # check 
@@ -74,6 +73,8 @@ def validate_access_token(access_token:str): # check
         save_tokens(old_access_token=old_access_token,access_token=access_token, refresh_token=refresh_token)
         
     return access_token
+
+
 def update_refresh_token(token:str):
     dtoken=decode_token(token)
     if Email_in_bd(dtoken["sub"]):

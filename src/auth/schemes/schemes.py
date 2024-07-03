@@ -5,9 +5,10 @@ class CreateUser(BaseModel):
     username:str
     password:str
 
-class LoginUser(BaseModel):
+class User_to_login(BaseModel):
     email:str
     password:str
+    
 class Tokens(BaseModel):
     access_token:str
     refresh_token:str

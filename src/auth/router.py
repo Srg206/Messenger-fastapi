@@ -4,7 +4,7 @@ from ..connection_to_postgres import * # type: ignore
 from sqlalchemy import select, insert
 from .models.models import User
 from ..utils.utils import *
-from .schemes.schemes import CreateUser, LoginUser
+from .schemes.schemes import CreateUser, User_to_login
 from ..connection_to_postgres import *
 from src.work_with_db.work_with_users import *
 
@@ -25,7 +25,7 @@ AUTH_EX=HTTPException(
         )
 
 @auth_router.post("/create_user")
-def login(user_data: CreateUser):
+def login(user_data: CreateUser, response: Response):
     print("create_user")
     session = sync_session
     try:
@@ -37,18 +37,26 @@ def login(user_data: CreateUser):
             hashed_password = encode_password(user_data.password)
             new_record = User(name=user_data.username, email=user_data.email, password=hashed_password)
             session.add(new_record)
+            access_token= Login_User(user_data=User_to_login(email=user_data.email, password=user_data.password),response=response)
             session.commit()
             session.close()
-            return {"access_token": create_jwt_token({"sub": user_data.email})}
-        except:
+            return {"access_token": access_token}
+        except Exception as e:
+            print(e)
             raise SERV_EX
-        
     else:
          raise AUTH_EX
         
 
+
+    
+
+
+
+
+
 @auth_router.post("/login_by_pass")
-def login(user_data: LoginUser,response: Response):
+def login(user_data: User_to_login,response: Response):
     print('login_by_pass')
     session = sync_session
     access_token= Login_User(user_data=user_data,response=response)
@@ -56,8 +64,10 @@ def login(user_data: LoginUser,response: Response):
     
 
 @auth_router.post("/validate_cookie")
-def validate_cookie(token:str=Depends(decode_token)):
+def validate_cookie( response: Response, token:str=Depends(decode_token)):
     token=create_jwt_token({"sub": token["sub"], "created_at": token["created_at"]})
     print('validate_cookie')
-    return Cookie_is_Valid(token)
+    res_jwt=Cookie_is_Valid(token)
+    response.set_cookie(res_jwt)
+    return {"access_token":res_jwt}
     
