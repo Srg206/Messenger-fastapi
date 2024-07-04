@@ -5,6 +5,9 @@ class CreateUser(BaseModel):
     username:str
     password:str
 
+class VerificationInfo(BaseModel):
+    code:int
+
 class User_to_login(BaseModel):
     email:str
     password:str
@@ -12,6 +15,3 @@ class User_to_login(BaseModel):
 class Tokens(BaseModel):
     access_token:str
     refresh_token:str
-
-class VerificationInfo(BaseModel):
-    code:int

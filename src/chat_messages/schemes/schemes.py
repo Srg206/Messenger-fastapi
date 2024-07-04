@@ -14,7 +14,7 @@ class GlobalChat(BaseModel):
     
 class CreateChat(BaseModel):
     name:str
-    users: List[int]
+    users: List[str]
 
     
 

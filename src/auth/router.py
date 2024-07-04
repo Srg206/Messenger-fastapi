@@ -37,6 +37,7 @@ def login(user_data: CreateUser, response: Response):
     if (not user_exist):
         try:
             Send_verification_number(user_data.email)
+            return {"Success"}
             # return {"access_token": access_token}
         except Exception as e:
             print(e)

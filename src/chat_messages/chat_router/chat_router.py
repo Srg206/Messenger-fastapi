@@ -25,8 +25,9 @@ chat_router = APIRouter(
 
 @chat_router.post("/create_chat")
 async def create_chat(new_chat:CreateChat):
+    
     print(new_chat)
-    insert_new_chat(new_chat)        
+    return insert_new_chat(new_chat)        
     
 @chat_router.get("/get_last_chats")
 async def get_last_chats(token:str=Depends(decode_token)):
@@ -46,7 +47,11 @@ async def get_last_chats(token:str=Depends(decode_token)):
     return this_user_chats
         
     
-    
+  
+@chat_router.get("/get_email")
+async def get_last_chats(token:str=Depends(decode_token)):
+    return token["sub"]
+        
     
     
     
