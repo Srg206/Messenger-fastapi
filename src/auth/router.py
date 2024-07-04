@@ -4,9 +4,10 @@ from ..connection_to_postgres import * # type: ignore
 from sqlalchemy import select, insert
 from .models.models import User
 from ..utils.utils import *
-from .schemes.schemes import CreateUser, User_to_login
+from .schemes.schemes import CreateUser, User_to_login,VerificationInfo
 from ..connection_to_postgres import *
 from src.work_with_db.work_with_users import *
+from .utils import *
 
 
 auth_router = APIRouter(
@@ -24,6 +25,7 @@ AUTH_EX=HTTPException(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+
 @auth_router.post("/create_user")
 def login(user_data: CreateUser, response: Response):
     print("create_user")
@@ -34,24 +36,29 @@ def login(user_data: CreateUser, response: Response):
         raise SERV_EX
     if (not user_exist):
         try:
-            hashed_password = encode_password(user_data.password)
-            new_record = User(name=user_data.username, email=user_data.email, password=hashed_password)
-            session.add(new_record)
-            access_token= Login_User(user_data=User_to_login(email=user_data.email, password=user_data.password),response=response)
-            session.commit()
-            session.close()
-            return {"access_token": access_token}
+            Send_verification_number(user_data.email)
+            # return {"access_token": access_token}
         except Exception as e:
             print(e)
             raise SERV_EX
     else:
          raise AUTH_EX
-        
-
-
     
 
-
+@auth_router.post("/verify_code")
+def verification(code:VerificationInfo,user_data: CreateUser,response:Response):
+    print('verification')
+    if verify_code(code.code,user_data.email):
+        session = sync_session
+        hashed_password = encode_password(user_data.password)
+        new_record = User(name=user_data.username, email=user_data.email, password=hashed_password)
+        session.add(new_record)
+        after_register_access_token= Login_User(user_data=User_to_login(email=user_data.email, password=user_data.password),response=response)
+        session.commit()
+        session.close()
+        return {"access_token": after_register_access_token}
+    else:
+        raise AUTH_EX
 
 
 

@@ -13,3 +13,5 @@ class Tokens(BaseModel):
     access_token:str
     refresh_token:str
 
+class VerificationInfo(BaseModel):
+    code:int
