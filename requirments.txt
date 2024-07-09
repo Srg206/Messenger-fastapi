@@ -1,9 +1,0 @@
-fastapi
-uvicorn
-sqlalchemy
-psycopg
-psycopg_binary
-asyncpg
-bcrypt
-pyjwt
-pytz

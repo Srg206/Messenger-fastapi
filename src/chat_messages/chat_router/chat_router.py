@@ -4,7 +4,6 @@ from pydantic import BaseModel
 from sqlalchemy import select, insert
 
 from src.auth.models.models import User
-from src.chat_messages.utils.utils import ConverToPydentic
 from src.utils.utils import decode_token
 from ..schemes.schemes import CreateChat
 from .__init__ import *
@@ -25,26 +24,13 @@ chat_router = APIRouter(
 
 @chat_router.post("/create_chat")
 async def create_chat(new_chat:CreateChat):
-    
     print(new_chat)
     return insert_new_chat(new_chat)        
     
 @chat_router.get("/get_last_chats")
 async def get_last_chats(token:str=Depends(decode_token)):
-    got_gmail=token["sub"]
-    session = sync_session
-    print(got_gmail)
-    chats=session.query(User).filter_by(email=got_gmail).first().chats
-    
-    this_user_chats=[]
-    for x in chats:
-        last_message=ConverToPydentic(x.messages[-1])
-        print(last_message)
-        cur_chat={'chat_name':x.name,"last_message":last_message,'chat_id':x.id}
-        this_user_chats.append(cur_chat)
-    
-    this_user_chats = sorted(this_user_chats, key=lambda x: x['last_message'].time, reverse=True)
-    return this_user_chats
+    got_email=token["sub"]
+    return get_last_chats_by_email(got_email)
         
     
   
@@ -53,9 +39,7 @@ async def get_last_chats(token:str=Depends(decode_token)):
     return token["sub"]
         
     
-    
-    
-    
+   
     
     
     

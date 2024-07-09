@@ -3,6 +3,7 @@ from src.auth.models.models import User
 from src.chat_messages.models.models import Chat, Message
 from src.chat_messages.schemes.schemes import GotMsg
 from src.utils.utils import decode_token
+from src.work_with_db.Check_access_to import check_access_to_chat
 from ..connection_to_postgres import sync_session
 from ..chat_messages.models.association_models import User_Chat
 
@@ -12,7 +13,7 @@ def insert_message(new_msg: GotMsg):
     email=decode_token(new_msg.token)['sub']
     user=session.query(User).filter(User.email==email).first()
     chat=session.query(Chat).filter(Chat.id==new_msg.chat_id).first()
-    if check_access(user, chat):
+    if check_access_to_chat(user.email, chat.id):
         db_msg=Message(
             content=new_msg.content,
             chat_id=new_msg.chat_id,
@@ -34,9 +35,3 @@ def insert_message(new_msg: GotMsg):
             status_code=1000,
             detail="You do not have access to this chat",
         )
-
-def check_access(user: User,chat: Chat):
-    session=sync_session
-    query = session.query(User_Chat).filter(User_Chat.chat_id==chat.id).all()
-    users=[x.user_id for x in query]
-    return user.id in users

@@ -26,6 +26,7 @@ class PydtcMessage(BaseModel):
     date:str
     time:str
     timezone:str
+    email:str
 
 class GotMsg(BaseModel):
     content:str

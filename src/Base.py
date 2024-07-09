@@ -5,4 +5,3 @@ from typing import Annotated
 Base = declarative_base()
 
 metadata=MetaData()
-intpk=Annotated[int,mapped_column(primary_key=True)]
