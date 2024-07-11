@@ -9,15 +9,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app=FastAPI()
 
-origins = [
-    "http://localhost:8000",
-    "http://localhost",
-    "http://127.0.0.1:8000",
-    "https://193.124.115.115",
-    "http://127.0.0.1:8000/auth/login"
-]
-
-
 #origins = ["http://127.0.0.1:4000"]
 
 # Add CORS middleware to your app
