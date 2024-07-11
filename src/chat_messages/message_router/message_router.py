@@ -66,4 +66,16 @@ async def websocket_endpoint(chat_id : int, websocket: WebSocket):
     except Exception as e:
         print(f"Unexpected error: {e}")
         await chat_manager.disconnect(websocket)
+
+
+@message_router.get("/get_email_from_msgs/{chat_id}")
+async def get_last_chats(chat_id:int,token:str=Depends(decode_token)):
+    session = sync_session
+    if check_access_to_chat(token["sub"],chat_id):
+        messages=session.query(Message).filter(Message.chat_id == chat_id).order_by(Message.time).limit(100).all()
+    else:
+        raise AUTH_EX
+    
+    print([ConvertToPydentic(msg) for msg in messages])
+    return [ConvertToPydentic(msg) for msg in messages]
     
