@@ -7,6 +7,6 @@ asyncpg
 bcrypt
 pyjwt
 pytz
-docker.io
+docker
 alembic
 psycopg2-binary
